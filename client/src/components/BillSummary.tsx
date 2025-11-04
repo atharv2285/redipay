@@ -16,40 +16,9 @@ export default function BillSummary({ items }: BillSummaryProps) {
     const transactionNote = "Bill Payment";
     const amount = total.toFixed(2);
     
-    const params = `pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${encodeURIComponent(amount)}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+    const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${encodeURIComponent(amount)}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
     
-    const apps = [
-      { name: 'Paytm', url: `paytmmp://pay?${params}` },
-      { name: 'GPay', url: `tez://upi/pay?${params}` },
-      { name: 'PhonePe', url: `phonepe://pay?${params}` }
-    ];
-    
-    let currentAppIndex = 0;
-    const startTime = Date.now();
-    
-    const tryNextApp = () => {
-      if (currentAppIndex >= apps.length) {
-        return;
-      }
-      
-      const app = apps[currentAppIndex];
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = app.url;
-      document.body.appendChild(iframe);
-      
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-        
-        const timeElapsed = Date.now() - startTime;
-        if (timeElapsed < 2000 && currentAppIndex < apps.length - 1) {
-          currentAppIndex++;
-          tryNextApp();
-        }
-      }, 1000);
-    };
-    
-    tryNextApp();
+    window.location.href = upiUrl;
   };
 
   const isDisabled = items.length === 0;
