@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import SearchBar from "@/components/SearchBar";
 import AutocompleteDropdown from "@/components/AutocompleteDropdown";
 import BillItemRow from "@/components/BillItemRow";
@@ -6,60 +7,23 @@ import BillSummary from "@/components/BillSummary";
 import { MenuItem, BillItem } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
-const MENU_ITEMS: MenuItem[] = [
-  { id: "1", name: "Masala Maggi", price: 4000 },
-  { id: "2", name: "Cheese Maggi", price: 5000 },
-  { id: "3", name: "Plain Maggi", price: 3500 },
-  { id: "4", name: "Bread Omelette", price: 5000 },
-  { id: "5", name: "Bread Butter", price: 3000 },
-  { id: "6", name: "Bread Jam", price: 3500 },
-  { id: "7", name: "Cheese Sandwich", price: 6000 },
-  { id: "8", name: "Veg Sandwich", price: 5000 },
-  { id: "9", name: "Grilled Sandwich", price: 7000 },
-  { id: "10", name: "Tea", price: 2000 },
-  { id: "11", name: "Coffee", price: 2500 },
-  { id: "12", name: "Cold Coffee", price: 8000 },
-  { id: "13", name: "Hot Chocolate", price: 9000 },
-  { id: "14", name: "Lemon Tea", price: 2500 },
-  { id: "15", name: "Green Tea", price: 3000 },
-  { id: "16", name: "Coca Cola", price: 4000 },
-  { id: "17", name: "Pepsi", price: 4000 },
-  { id: "18", name: "Sprite", price: 4000 },
-  { id: "19", name: "Fanta", price: 4000 },
-  { id: "20", name: "Thumbs Up", price: 4000 },
-  { id: "21", name: "Mineral Water", price: 2000 },
-  { id: "22", name: "Pakoda", price: 4500 },
-  { id: "23", name: "Samosa", price: 3000 },
-  { id: "24", name: "Vada Pav", price: 3500 },
-  { id: "25", name: "Pav Bhaji", price: 8000 },
-  { id: "26", name: "Misal Pav", price: 7000 },
-  { id: "27", name: "Poha", price: 5000 },
-  { id: "28", name: "Upma", price: 4500 },
-  { id: "29", name: "Idli Sambar", price: 6000 },
-  { id: "30", name: "Dosa", price: 7000 },
-  { id: "31", name: "Uttapam", price: 7500 },
-  { id: "32", name: "Paratha", price: 6000 },
-  { id: "33", name: "Aloo Paratha", price: 7000 },
-  { id: "34", name: "Paneer Paratha", price: 9000 },
-  { id: "35", name: "Bhel Puri", price: 5000 },
-  { id: "36", name: "Pani Puri", price: 4000 },
-  { id: "37", name: "Sev Puri", price: 5500 },
-  { id: "38", name: "Dahi Puri", price: 6000 },
-];
-
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [billItems, setBillItems] = useState<BillItem[]>([]);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const { toast } = useToast();
 
+  const { data: menuItems = [], isLoading } = useQuery<MenuItem[]>({
+    queryKey: ["/api/menu-items"],
+  });
+
   const filteredItems = useMemo(() => {
-    if (searchQuery.length < 2) return [];
+    if (searchQuery.length < 2 || !menuItems.length) return [];
     const query = searchQuery.toLowerCase();
-    return MENU_ITEMS.filter(item => 
+    return menuItems.filter(item => 
       item.name.toLowerCase().includes(query)
     ).slice(0, 10);
-  }, [searchQuery]);
+  }, [searchQuery, menuItems]);
 
   const addItemToBill = (item: MenuItem) => {
     setBillItems(prev => {
@@ -120,6 +84,17 @@ export default function Home() {
       duration: 3000,
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading menu...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
