@@ -100,9 +100,17 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <header className="bg-background border-b border-border sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <h1 className="text-2xl font-bold text-primary" data-testid="text-title">
-            Ashok Redi Billing
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-primary" data-testid="text-title">
+              Ashok Redi Billing
+            </h1>
+            <img 
+              src="/attached_assets/Screenshot 2025-11-04 at 4.35.54 PM_1762254371297.png" 
+              alt="Redipay Logo" 
+              className="h-10"
+              data-testid="img-logo"
+            />
+          </div>
         </div>
       </header>
 
