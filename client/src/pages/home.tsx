@@ -39,12 +39,6 @@ export default function Home() {
     });
     setSearchQuery("");
     setHighlightedIndex(0);
-    
-    toast({
-      title: "Item added",
-      description: `${item.name} added to bill`,
-      duration: 2000,
-    });
   };
 
   const removeItemFromBill = (id: string) => {
@@ -79,37 +73,15 @@ export default function Home() {
     
     const total = billItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) / 100;
     
-    if (total <= 0) {
-      toast({
-        title: "Invalid amount",
-        description: "Please add items to the bill",
-        duration: 2000,
-      });
-      return;
-    }
+    if (total <= 0) return;
     
     const upiId = "paytmqr5w8oju@ptys";
     const payeeName = "Ashok Redi";
     const transactionNote = "Bill Payment";
     
-    const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${encodeURIComponent(total.toFixed(2))}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+    const paytmUrl = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${encodeURIComponent(total.toFixed(2))}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
     
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-      window.location.href = upiUrl;
-      toast({
-        title: "Opening payment app",
-        description: `Total amount: ₹${total.toFixed(2)}`,
-        duration: 3000,
-      });
-    } else {
-      toast({
-        title: "UPI Payment",
-        description: `Pay ₹${total.toFixed(2)} to UPI ID: ${upiId}`,
-        duration: 5000,
-      });
-    }
+    window.location.href = paytmUrl;
   };
 
   if (isLoading) {
@@ -132,7 +104,7 @@ export default function Home() {
               Ashok Redi Billing
             </h1>
             <img 
-              src="/attached_assets/Screenshot 2025-11-04 at 4.35.54 PM_1762254371297.png" 
+              src="/redipay-logo.png" 
               alt="Redipay Logo" 
               className="h-10"
               data-testid="img-logo"
