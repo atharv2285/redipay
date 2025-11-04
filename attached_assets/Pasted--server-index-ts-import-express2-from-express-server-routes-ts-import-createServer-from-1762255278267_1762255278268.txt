@@ -1,0 +1,294 @@
+// server/index.ts
+import express2 from "express";
+
+// server/routes.ts
+import { createServer } from "http";
+
+// server/storage.ts
+import { randomUUID } from "crypto";
+var MemStorage = class {
+  menuItems;
+  constructor() {
+    this.menuItems = /* @__PURE__ */ new Map();
+    this.seedMenuItems();
+  }
+  seedMenuItems() {
+    const items = [
+      { name: "Mousami Juice", price: 4e3 },
+      { name: "Orange Juice", price: 4e3 },
+      { name: "Apple Shake", price: 5e3 },
+      { name: "Badam Milk", price: 4e3 },
+      { name: "Rose Milk", price: 4e3 },
+      { name: "Khus Milk", price: 4e3 },
+      { name: "Chocolate Milk", price: 4e3 },
+      { name: "Cold Coffee", price: 4e3 },
+      { name: "Mango Shake", price: 5e3 },
+      { name: "Ice Masala Tea", price: 4e3 },
+      { name: "Masala Cold Drink", price: 3e3 },
+      { name: "Rose Sarbat", price: 3e3 },
+      { name: "Khus Sarbat", price: 3e3 },
+      { name: "Shakanji", price: 2500 },
+      { name: "Lemon Soda", price: 3e3 },
+      { name: "Sweet Lassi", price: 4e3 },
+      { name: "Namkin Lassi", price: 4e3 },
+      { name: "Banana Shake", price: 3e3 },
+      { name: "Aam Panna", price: 5e3 },
+      { name: "Papaya Shake", price: 5e3 },
+      { name: "Watermelon", price: 5e3 },
+      { name: "Plain Samosa", price: 1500 },
+      { name: "Paneer Samosa", price: 2e3 },
+      { name: "Single Samosa Chat", price: 3e3 },
+      { name: "Double Samosa Chat", price: 5e3 },
+      { name: "Chola Samosa Chat", price: 4e3 },
+      { name: "Papadi Chat", price: 4e3 },
+      { name: "Paneer Samosa Chat", price: 4e3 },
+      { name: "Single Bread Samosa", price: 2500 },
+      { name: "Double Bread Samosa", price: 5e3 },
+      { name: "Plain Maggi", price: 3e3 },
+      { name: "Paneer Maggi", price: 5e3 },
+      { name: "Butter Maggi", price: 4e3 },
+      { name: "Milk Maggi", price: 4500 },
+      { name: "Extra Masala Maggi", price: 4e3 },
+      { name: "Atta Maggi", price: 4e3 },
+      { name: "Atta Maggi Cheese", price: 4500 },
+      { name: "Cheese Maggi", price: 5e3 },
+      { name: "Veg Cheese Maggi", price: 6500 },
+      { name: "Plain Chola Kulcha", price: 4e3 },
+      { name: "Cheese Chola Kulcha", price: 7e3 },
+      { name: "Peanut Butter Sandwich", price: 4e3 },
+      { name: "Peanut Sandwich Combo", price: 5e3 },
+      { name: "Masala Sandwich", price: 4e3 },
+      { name: "Masala Cheese Sandwich", price: 5e3 },
+      { name: "Malai Sandwich", price: 4e3 },
+      { name: "Bread Toast", price: 3e3 },
+      { name: "Poha", price: 3e3 },
+      { name: "Chola Poha", price: 5e3 },
+      { name: "Rabdi", price: 4e3 },
+      { name: "Gulab Jamun Rabdi", price: 5e3 },
+      { name: "Pasta", price: 5e3 },
+      { name: "Pakaudi", price: 4e3 },
+      { name: "Chips Chat", price: 5e3 },
+      { name: "Fruit Chat", price: 5e3 },
+      { name: "Pav Bhaji", price: 4e3 },
+      { name: "Bhal Puri", price: 2500 },
+      { name: "Bread Pakora", price: 3e3 },
+      { name: "Masala Kachori", price: 4e3 },
+      { name: "Chat Kachori", price: 3500 },
+      { name: "Paneer Patties", price: 4e3 },
+      { name: "Cheese Patties", price: 3e3 },
+      { name: "Masala Patties", price: 3e3 },
+      { name: "Ice Gola", price: 1e3 },
+      { name: "Tea", price: 1e3 },
+      { name: "Coffee", price: 2e3 }
+    ];
+    items.forEach((item) => {
+      const id = randomUUID();
+      this.menuItems.set(id, { ...item, id });
+    });
+  }
+  async getAllMenuItems() {
+    return Array.from(this.menuItems.values());
+  }
+  async getMenuItem(id) {
+    return this.menuItems.get(id);
+  }
+  async searchMenuItems(query) {
+    const lowerQuery = query.toLowerCase();
+    return Array.from(this.menuItems.values()).filter(
+      (item) => item.name.toLowerCase().includes(lowerQuery)
+    );
+  }
+};
+var storage = new MemStorage();
+
+// server/routes.ts
+async function registerRoutes(app2) {
+  app2.get("/api/menu-items", async (req, res) => {
+    try {
+      const items = await storage.getAllMenuItems();
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch menu items" });
+    }
+  });
+  app2.get("/api/menu-items/search", async (req, res) => {
+    try {
+      const query = req.query.q;
+      if (!query || query.length < 2) {
+        return res.json([]);
+      }
+      const items = await storage.searchMenuItems(query);
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to search menu items" });
+    }
+  });
+  const httpServer = createServer(app2);
+  return httpServer;
+}
+
+// server/vite.ts
+import express from "express";
+import fs from "fs";
+import path2 from "path";
+import { createServer as createViteServer, createLogger } from "vite";
+
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+var vite_config_default = defineConfig({
+  plugins: [
+    react(),
+    runtimeErrorOverlay(),
+    ...process.env.NODE_ENV !== "production" && process.env.REPL_ID !== void 0 ? [
+      await import("@replit/vite-plugin-cartographer").then(
+        (m) => m.cartographer()
+      ),
+      await import("@replit/vite-plugin-dev-banner").then(
+        (m) => m.devBanner()
+      )
+    ] : []
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@assets": path.resolve(import.meta.dirname, "attached_assets")
+    }
+  },
+  root: path.resolve(import.meta.dirname, "client"),
+  build: {
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    emptyOutDir: true
+  },
+  server: {
+    fs: {
+      strict: true,
+      deny: ["**/.*"]
+    }
+  }
+});
+
+// server/vite.ts
+import { nanoid } from "nanoid";
+var viteLogger = createLogger();
+function log(message, source = "express") {
+  const formattedTime = (/* @__PURE__ */ new Date()).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
+async function setupVite(app2, server) {
+  const serverOptions = {
+    middlewareMode: true,
+    hmr: { server },
+    allowedHosts: true
+  };
+  const vite = await createViteServer({
+    ...vite_config_default,
+    configFile: false,
+    customLogger: {
+      ...viteLogger,
+      error: (msg, options) => {
+        viteLogger.error(msg, options);
+        process.exit(1);
+      }
+    },
+    server: serverOptions,
+    appType: "custom"
+  });
+  app2.use(vite.middlewares);
+  app2.use("*", async (req, res, next) => {
+    const url = req.originalUrl;
+    try {
+      const clientTemplate = path2.resolve(
+        import.meta.dirname,
+        "..",
+        "client",
+        "index.html"
+      );
+      let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      template = template.replace(
+        `src="/src/main.tsx"`,
+        `src="/src/main.tsx?v=${nanoid()}"`
+      );
+      const page = await vite.transformIndexHtml(url, template);
+      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+    } catch (e) {
+      vite.ssrFixStacktrace(e);
+      next(e);
+    }
+  });
+}
+function serveStatic(app2) {
+  const distPath = path2.resolve(import.meta.dirname, "public");
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`
+    );
+  }
+  app2.use(express.static(distPath));
+  app2.use("*", (_req, res) => {
+    res.sendFile(path2.resolve(distPath, "index.html"));
+  });
+}
+
+// server/index.ts
+var app = express2();
+app.use(express2.json({
+  verify: (req, _res, buf) => {
+    req.rawBody = buf;
+  }
+}));
+app.use(express2.urlencoded({ extended: false }));
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path3 = req.path;
+  let capturedJsonResponse = void 0;
+  const originalResJson = res.json;
+  res.json = function(bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path3.startsWith("/api")) {
+      let logLine = `${req.method} ${path3} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "\u2026";
+      }
+      log(logLine);
+    }
+  });
+  next();
+});
+(async () => {
+  const server = await registerRoutes(app);
+  app.use((err, _req, res, _next) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({ message });
+    throw err;
+  });
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
+  }
+  const port = parseInt(process.env.PORT || "5000", 10);
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+})();
