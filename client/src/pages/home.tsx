@@ -78,11 +78,38 @@ export default function Home() {
     if (billItems.length === 0) return;
     
     const total = billItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) / 100;
-    toast({
-      title: "Payment initiated",
-      description: `Total amount: ₹${total.toFixed(2)}`,
-      duration: 3000,
-    });
+    
+    if (total <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please add items to the bill",
+        duration: 2000,
+      });
+      return;
+    }
+    
+    const upiId = "paytmqr5w8oju@ptys";
+    const payeeName = "Ashok Redi";
+    const transactionNote = "Bill Payment";
+    
+    const upiUrl = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${encodeURIComponent(total.toFixed(2))}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+    
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      window.location.href = upiUrl;
+      toast({
+        title: "Opening payment app",
+        description: `Total amount: ₹${total.toFixed(2)}`,
+        duration: 3000,
+      });
+    } else {
+      toast({
+        title: "UPI Payment",
+        description: `Pay ₹${total.toFixed(2)} to UPI ID: ${upiId}`,
+        duration: 5000,
+      });
+    }
   };
 
   if (isLoading) {
