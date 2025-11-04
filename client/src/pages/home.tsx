@@ -68,21 +68,6 @@ export default function Home() {
     }
   };
 
-  const handlePay = () => {
-    if (billItems.length === 0) return;
-    
-    const total = billItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) / 100;
-    
-    if (total <= 0) return;
-    
-    const upiId = "paytmqr5w8oju@ptys";
-    const payeeName = "Ashok Redi";
-    const transactionNote = "Bill Payment";
-    
-    const paytmUrl = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${encodeURIComponent(total.toFixed(2))}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-    
-    window.location.href = paytmUrl;
-  };
 
   if (isLoading) {
     return (
@@ -154,7 +139,7 @@ export default function Home() {
 
           <div className="bg-card rounded-lg shadow-md p-6 h-fit sticky top-24">
             <h2 className="text-xl font-bold text-foreground mb-6">Summary</h2>
-            <BillSummary items={billItems} onPay={handlePay} />
+            <BillSummary items={billItems} />
           </div>
         </div>
       </main>
