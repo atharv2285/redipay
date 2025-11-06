@@ -24,12 +24,12 @@ export default function BillSummary({ items }: BillSummaryProps) {
   const isDisabled = items.length === 0;
 
   return (
-    <div className="space-y-6">
-      <div className="border-t-2 border-border pt-4">
+    <div className="space-y-3 lg:space-y-6">
+      <div className="border-t-2 border-border pt-3 lg:pt-4">
         <div className="flex items-center justify-between">
-          <span className="text-xl font-bold text-foreground">Total</span>
+          <span className="text-lg lg:text-xl font-bold text-foreground">Total</span>
           <span 
-            className="text-3xl font-bold text-primary tabular-nums"
+            className="text-2xl lg:text-3xl font-bold text-primary tabular-nums"
             aria-live="polite"
             data-testid="text-total"
           >
@@ -40,7 +40,7 @@ export default function BillSummary({ items }: BillSummaryProps) {
 
       <Button
         onClick={handlePayNow}
-        className="w-full h-14 text-base font-bold"
+        className="w-full h-12 lg:h-14 text-base font-bold"
         size="lg"
         disabled={isDisabled}
         data-testid="button-pay"
